@@ -27,6 +27,44 @@ h1{
     text-align: center;
 }
 
-.boardDiv{
+.gameboard {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(10, 30px);
+    grid-template-rows: repeat(10, 30px);
+    gap: 1px;
+    justify-content: center;
+}
+#player2gameboard{
+    display: none;
+}
 
+.cell {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #4b4b4b;
+}
+
+.playerShip{
+    background-color:rgb(202, 215, 127)
+}
+
+.oppHit{
+    background-color: rgb(133, 133, 227)
+}
+
+.oppSunk{
+    background-color: rgb(74, 74, 235)
+}
+
+.playerMissed{
+    background-color: rgb(106, 106, 106)
+}
+
+.playerIsHit{
+    background-color: rgb(217, 135, 135)
+}
+
+.playerShipSunk{
+    background-color: rgb(166, 63, 63)
 }
