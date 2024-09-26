@@ -39,27 +39,27 @@ function Gameboard() {
       board.push(row); // Add the row to the board
     }
   }  
-  function placeShip(ship, startingX, startingY, orientation) {
+  function placeShip(ship, row, column, orientation) {
     // Check paremeters. Throw error if ne is incorrect / missing
     if (
       !ship ||
-      !Number.isInteger(startingX) ||
-      !Number.isInteger(startingY) ||
+      !Number.isInteger(row) ||
+      !Number.isInteger(column) ||
       !orientation
     ) {
       throw new Error("Invalid ship, coordinates, orientation or length");
     }
 
+    let x = row;
+    let y = column;
+    
     // Loop through ship length in direction of orientation, set coordinates & place segments
     for (let i = 0; i < ship.length; i++) {
-      let x = startingX;
-      let y = startingY;
-
       // Increment the x or y (depending on orientation) by the length
       if (orientation === "horizontal") {
-        x = startingX + i;
+        x = row + i;
       } else if (orientation === "vertical") {
-        y = startingY + i;
+        y = column + i;
       }
 
       // Ensure new coordinates are within board bounds (10x10 board)
@@ -105,7 +105,6 @@ function Gameboard() {
     // Loops through the missedShots array to see if any hit matches the given x and y coordinates
     return missedShots.some((miss) => miss.x === x && miss.y === y);
   }
-
   function allShipsSunk(){
     return ships.every(ship => ship.isSunk()) // Returns true if every ship in ships array is sunk.  
   }
@@ -188,6 +187,11 @@ const player1 = NewPlayer("Human");
 const player2 = NewPlayer("PC");
 
 // Render player 1's board
+dom.renderGameboard(player1, player2);
+// Create new ship
+const p1ship1 = NewShip(3);
+
+player1.gameboard.placeShip(p1ship1, 0, 1, 'vertical');
 dom.renderGameboard(player1, player2);
 
 // module.exports = { NewShip, Gameboard, NewPlayer };
