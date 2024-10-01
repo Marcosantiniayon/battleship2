@@ -239,7 +239,7 @@ const dom = (() => {
   }
 
   function addBoardClickListeners(currentPlayer, playerGameboard, oppGameboard, cell, i, j) {
-    function clickHandler(event) {
+    cell.addEventListener("click", function (event){
       const x = event.target.dataset.x;
       const y = event.target.dataset.y;
 
@@ -247,6 +247,9 @@ const dom = (() => {
       oppGameboard.markCellAsClicked(i, j);
       dom.renderGameboard(player1, player2);
 
+      changePlayer(currentPlayer, oppGameboard, i, j);
+    })
+    function changePlayer(currentPlayer, oppGameboard, i, j) {
       // if (currentPlayer === player1 && !oppGameboard.isHitAt(i, j)) {
       //   console.log(`Player 1 miss. Player 2's turn`);
       //   //dom.renderGameboard(player2, player1); // Human Player 2's turn
@@ -256,13 +259,14 @@ const dom = (() => {
         // Player 1 hit. Still player 1's turn
         dom.renderGameboard(player2, player1);
         dom.renderGameboard(player1, player2);
-        console.log(`Player 1 hit. Still player 1's turn`)
+        console.log(`Player 1 hit. Still player 1's turn`);
       } else if (currentPlayer === player1 && !oppGameboard.isHitAt(i, j)) {
         // Player 1 miss. Player 2's turn
         dom.renderGameboard(player1, player2);
         dom.renderGameboard(player2, player1);
         console.log(`Player 1 miss. Player 2's turn`);
-      } if (currentPlayer === player2 && oppGameboard.isHitAt(i, j)) {
+      }
+      if (currentPlayer === player2 && oppGameboard.isHitAt(i, j)) {
         // Player 2 hit. Still player 2's turn
         dom.renderGameboard(player1, player2);
         dom.renderGameboard(player2, player1);
@@ -274,21 +278,17 @@ const dom = (() => {
         console.log(`Player 2 miss. Player 1's turn`);
       }
     }
-    // Store the clickHandler function on the cell (Done in order to be able to call it to remove listener)
-    cell.clickHandler = clickHandler;
-
-    // Call the ClickHandler when the cell is clicked
-    cell.addEventListener("click", clickHandler);
-    
   }
-
-
-  // function removeBoardClickListener(cell) {
-  //   cell.removeEventListener("click", cell.clickHandler);
-  // }
   
   return { renderGameboard, addBoardClickListeners };
 })();
+
+
+// Fade overlay
+window.addEventListener("load", () => {
+  document.body.classList.add("loaded");
+});
+
 
 
 // Creat new players

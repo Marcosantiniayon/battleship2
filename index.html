@@ -8,19 +8,30 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Naval Strike</h1>
-    <div class="main">
-        <div id="player1boardDiv" class="boardDiv">
-            <h3>Player</h3>
-            <div id="player1board" class="gameboard">
-            </div>
+    <div class="background-wrapper"></div>
+    
+    <div class="content">
+        <div class="heading">
+            <h1>Naval Strike</h1>
+            <button>New Game</button>
         </div>
-        <div id="player2boardDiv" class="boardDiv">
-            <h3>Opponent</h3>
-            <div id="player2board" class="gameboard">
+    
+        <div class="menu">
+            Choose Opponent: Human | PC
+        </div>
+    
+        <div class="main">
+            <div id="player1boardDiv" class="boardDiv">
+                <h3>Player</h3>
+                <div id="player1board" class="gameboard"></div>
+            </div>
+            <div id="player2boardDiv" class="boardDiv">
+                <h3>Opponent</h3>
+                <div id="player2board" class="gameboard"></div>
             </div>
         </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
