@@ -103,12 +103,9 @@ function Gameboard() {
     if (isShipAt(x, y) === true) {
       board[x][y].hit(); //board[coordinates] refers to a segment of the ship
       hits.push({ x, y });
-      console.log("Hit registered at", x, y);
       return "hit";
     } else {
       missedShots.push([x, y]);
-      console.log("Missed shot at", x, y);
-      console.log("Current missed shots:", missedShots); // Debugging
       return "miss";
     }
   }
@@ -154,99 +151,161 @@ function NewPlayer(type) {
 }
 
 const dom = (() => {
-    function renderGameboard(currentPlayer, opponent) {
-        const playerGameboard = currentPlayer.gameboard;
-        const oppGameboard = opponent.gameboard;
-        let playerGameBoardElement = null;
-        let oppGameboardElement = null;
+  function renderGameboard(currentPlayer, opponent) {
+    const playerGameboard = currentPlayer.gameboard;
+    const oppGameboard = opponent.gameboard;
+    let playerGameBoardElement = null;
+    let oppGameboardElement = null;
 
-        if (currentPlayer === player1) {
-            playerGameBoardElement = player1BoardElement;
-            oppGameboardElement = player2BoardElement;
-        } else if (currentPlayer === player2) {
-            playerGameBoardElement = player2BoardElement;
-            oppGameboardElement = player1BoardElement;
-        }
-
-        // Hide the opp board container. Clear & display the player board container
-        oppGameboardElement.style.display = "none";
-        playerGameBoardElement.innerHTML = "";
-        playerGameBoardElement.style.display = "grid";
-
-        // Create a 10 x 10 visual of the board (100 cells total) & mark cells based on click
-        for (let i = 0; i < 10; i++) {
-            for (let j = 0; j < 10; j++) {
-              const cell = document.createElement("div");
-              cell.classList.add("cell");
-              cell.dataset.x = i;
-              cell.dataset.y = j;
-
-              // Mark cells on gameboard based on state
-              if (playerGameboard.isShipAt(i, j)) {
-                cell.classList.add("playerShip");
-                console.log("playerShip ADDED");
-              }
-              if (oppGameboard.isHitAt(i, j)) {
-                cell.classList.add("attackHit");
-                console.log("attacksHit ADDED");
-              }
-               
-
-              if (oppGameboard.isMissAt(i, j)) {
-                cell.classList.add("attackMiss");
-                console.log("attakcsMiss ADDED");
-              }
-
-              // Check if the ship at the current coordinates is sunk
-              const playerShip = playerGameboard.getShipAt(i, j);
-              const opponentShip = oppGameboard.getShipAt(i, j);
-
-              if (playerShip && playerShip.isSunk()) {
-                cell.classList.add("playerSunk");
-              }
-              if (opponentShip && opponentShip.isSunk()) {
-                cell.classList.add("oppSunk");
-              }
-
-              // Add the cell to the board and apply click listeners
-              playerGameBoardElement.appendChild(cell);
-
-              // Only add click listeners if the cell hasn't already been clicked (hit or miss)
-              if (!oppGameboard.isCellClicked(i, j)) {
-                addBoardClickListeners(oppGameboard, cell);
-              }
-            }
-        }
+    if (currentPlayer === player1) {
+      playerGameBoardElement = player1BoardElement;
+      oppGameboardElement = player2BoardElement;
+    } else if (currentPlayer === player2) {
+      playerGameBoardElement = player2BoardElement;
+      oppGameboardElement = player1BoardElement;
     }
-    function addBoardClickListeners(oppGameboard, cell) {
-      function clickHandler(event) {
-        const x = event.target.dataset.x;
-        const y = event.target.dataset.y;
 
-        oppGameboard.receiveAttack(x, y);
-        oppGameboard.markCellAsClicked(x, y);
+    // Clear & display the player board containers
+    oppGameboardElement.style.display = "grid";
+    playerGameBoardElement.style.display = "grid";
+    oppGameboardElement.innerHTML = "";
+    playerGameBoardElement.innerHTML = "";
 
-        dom.renderGameboard(player1, player2);
+    // Create a 10 x 10 visual of the current player's board (100 cells total) & mark cell state. Add click listener
+    for (let i = 0; i < 10; i++) {
+      for (let j = 0; j < 10; j++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.dataset.x = i;
+        cell.dataset.y = j;
+
+        // Mark cells on gameboard based on state
+        if (playerGameboard.isShipAt(i, j)) {
+          cell.classList.add("playerShip");
+        }
+        if (playerGameboard.isHitAt(i, j)) {
+          cell.classList.add("playerIsHit");
+        }
+        if (oppGameboard.isHitAt(i, j)) {
+          cell.classList.add("attackHit");
+        }
+        if (oppGameboard.isMissAt(i, j)) {
+          cell.classList.add("attackMiss");
+        }
+
+        // Check if the ship at the current coordinates is sunk
+        const playerShip = playerGameboard.getShipAt(i, j);
+        const opponentShip = oppGameboard.getShipAt(i, j);
+
+        if (playerShip && playerShip.isSunk()) {
+          cell.classList.add("playerSunk");
+        }
+        if (opponentShip && opponentShip.isSunk()) {
+          cell.classList.add("oppSunk");
+        }
+
+        // Add the cell to the board and apply click listeners
+        playerGameBoardElement.appendChild(cell);
+
+        // Only add click listeners if the cell hasn't already been clicked (hit or miss)
+        if (!oppGameboard.isCellClicked(i, j)) {
+          addBoardClickListeners(currentPlayer, playerGameboard, oppGameboard, cell, i, j);
+        }
       }
-      // Store the clickHandler function on the cell (Done in order to be able to call it to remove listener)
-      cell.clickHandler = clickHandler;
-      
-      // Call the ClickHandler when the cell is clicked
-      cell.addEventListener("click", clickHandler);
-    }
-    function removeBoardClickListener(cell) {
-      cell.removeEventListener('click', cell.clickHandler)
     }
 
-    return { renderGameboard, addBoardClickListeners };
+    // Create a 10 x 10 visual of the current player's board (100 cells total) & mark cell state. Disable clicks
+    for (let i = 0; i < 10; i++) {
+      for (let j = 0; j < 10; j++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.dataset.x = i;
+        cell.dataset.y = j;
+
+        // Mark cells on gameboard based on state
+        if (oppGameboard.isShipAt(i, j)) {
+          cell.classList.add("playerShip");
+        }
+        // if (playerGameboard.isHitAt(i, j)) {
+        //   cell.classList.add("playerIsHit");
+        // }
+        if (playerGameboard.isHitAt(i, j)) {
+          cell.classList.add("attackHit");
+        }
+        if (playerGameboard.isMissAt(i, j)) {
+          cell.classList.add("attackMiss");
+        }
+
+        // Check if the ship at the current coordinates is sunk
+        const playerShip = oppGameboard.getShipAt(i, j);
+        const opponentShip = playerGameboard.getShipAt(i, j);
+
+        if (playerShip && playerShip.isSunk()) {
+          cell.classList.add("playerSunk");
+        }
+        if (opponentShip && opponentShip.isSunk()) {
+          cell.classList.add("oppSunk");
+        }
+
+        // Add the cell to the board and apply click listeners
+        oppGameboardElement.appendChild(cell);
+
+        // Only add click listeners if the opponent's cell hasn't already been attacked (hit or miss)
+        // if (!oppGameboard.isCellClicked(i, j)) {
+        //   addBoardClickListeners(oppGameboard, cell);
+        // }
+      }
+    }
+  }
+
+  function addBoardClickListeners(currentPlayer, playerGameboard, oppGameboard, cell, i, j) {
+    function clickHandler(event) {
+      const x = event.target.dataset.x;
+      const y = event.target.dataset.y;
+
+      oppGameboard.receiveAttack(i, j);
+      oppGameboard.markCellAsClicked(i, j);
+      dom.renderGameboard(player1, player2);
+
+      if (currentPlayer === player1 && oppGameboard.isHitAt(i, j)) {
+        // Player 1 hit. Still player 1's turn
+        dom.renderGameboard(player1, player2);
+        console.log(`Player 1 hit. Still player 1's turn`)
+      } else if (currentPlayer === player1 && !oppGameboard.isHitAt(i, j)) {
+        // Player 1 miss. Player 2's turn
+        dom.renderGameboard(player2, player1);
+        console.log(`Player 1 miss. Player 2's turn`);
+      } if (currentPlayer === player2 && oppGameboard.isHitAt(i, j)) {
+        // Player 2 hit. Still player 2's turn
+        dom.renderGameboard(player2, player1);
+        console.log(`Player 2 hit. Still player 2's turn`);
+      } else if (currentPlayer === player2 && !oppGameboard.isHitAt(i, j)) {
+        // Player 2 miss. Player 1's turn
+        dom.renderGameboard(player1, player2);
+        console.log(`Player 2 miss. Player 1's turn`);
+      }
+    }
+    // Store the clickHandler function on the cell (Done in order to be able to call it to remove listener)
+    cell.clickHandler = clickHandler;
+
+    // Call the ClickHandler when the cell is clicked
+    cell.addEventListener("click", clickHandler);
+    
+  }
+
+
+  // function removeBoardClickListener(cell) {
+  //   cell.removeEventListener("click", cell.clickHandler);
+  // }
+  
+  return { renderGameboard, addBoardClickListeners };
 })();
 
 
+// Creat new players
 const player1 = NewPlayer("Human");
 const player2 = NewPlayer("PC");
 
-// Render player 1's board
-dom.renderGameboard(player1, player2);
 // Create new ships
 const p1ship1 = NewShip(3);
 const p2ship1 = NewShip(3);
@@ -255,6 +314,7 @@ const p2ship1 = NewShip(3);
 player1.gameboard.placeShip(p1ship1, 0, 1, 'horizontal');
 player2.gameboard.placeShip(p2ship1, 0, 1, 'vertical');
 
+// Player 1's turn to start the game
 dom.renderGameboard(player1, player2);
 
 // module.exports = { NewShip, Gameboard, NewPlayer };

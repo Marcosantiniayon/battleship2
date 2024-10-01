@@ -9,7 +9,7 @@ body {
     display: flex;
     flex-direction: column;
     color: aliceblue;
-    background-color: blueviolet;
+    background-color: rgb(119, 119, 119);
 }
 
 .main {
@@ -36,7 +36,7 @@ h1{
     justify-content: center;
 }
 #player2gameboard{
-    display: none;
+    /* display: none; */
 }
 
 .cell {
@@ -46,15 +46,16 @@ h1{
 }
 
 .playerShip{
-    background-color:rgb(202, 215, 127)
+    background-color:rgba(171, 42, 42, .25);
+    border: 2px solid rgb(171, 42, 42);
 }
 
 .attackHit{
-    background-color: rgb(133, 133, 227)
+    background-color: rgb(76, 195, 165)
 }
 
 .oppSunk{
-    background-color: rgb(74, 74, 235)
+    background-color: rgb(73, 221, 90)
 }
 
 .attackMiss{
@@ -62,9 +63,10 @@ h1{
 }
 
 .playerIsHit{
-    background-color: rgb(217, 135, 135)
+    background-color: rgba(171, 83, 42, 1);
 }
 
 .playerSunk{
-    background-color: rgb(166, 63, 63)
+    background-color: rgb(220, 64, 64);
+    /* border: 2px solid rgb(109, 28, 28); */
 }
