@@ -15,6 +15,8 @@ body {
 .main {
     padding: 24px;
     flex: 1;
+    display: flex;
+    flex-direction: row;
 }
 
 h1{
@@ -22,7 +24,7 @@ h1{
 }
 
 .boardDiv{
-    /* max-width: 600px; */
+    width: 45%;
     margin: 0 auto;
     text-align: center;
 }
@@ -69,4 +71,21 @@ h1{
 .playerSunk{
     background-color: rgb(220, 64, 64);
     /* border: 2px solid rgb(109, 28, 28); */
+}
+
+/* Media Queries */
+.boardDiv {
+    margin: 0 auto;
+    text-align: center;
+}
+
+@media (max-width: 800px) {
+    .main {
+        flex-direction: column;
+        align-items: center;
+        gap:40px
+    }
+    /* .boardDiv {
+        width: 100%;
+    } */
 }
