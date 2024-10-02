@@ -151,6 +151,9 @@ function NewPlayer(type) {
 }
 
 const dom = (() => {
+  const pcBtn = document.getElementById("pcBtn");
+  const humanBtn = document.getElementById('humanBtn');
+  
   function renderGameboard(currentPlayer, opponent) {
     const playerGameboard = currentPlayer.gameboard;
     const oppGameboard = opponent.gameboard;
@@ -237,7 +240,6 @@ const dom = (() => {
       }
     }
   }
-
   function addBoardClickListeners(currentPlayer, playerGameboard, oppGameboard, cell, i, j) {
     cell.addEventListener("click", function (event){
       const x = event.target.dataset.x;
@@ -279,6 +281,15 @@ const dom = (() => {
       }
     }
   }
+
+  pcBtn.addEventListener("click", function () {
+    console.log("pc button clicked!");
+  });
+  humanBtn.addEventListener("click", function () {
+    console.log("human button clicked!");
+  });
+
+
   
   return { renderGameboard, addBoardClickListeners };
 })();
@@ -287,13 +298,19 @@ const dom = (() => {
 // Fade overlay
 window.addEventListener("load", () => {
   document.body.classList.add("loaded");
+  document.querySelector(".heading").classList.add("visible");
+
+  // Wait for the body to finish fading in before adding the visible class to the menu
+  setTimeout(() => {
+    document.querySelector(".menu").classList.add("visible");
+  }, 2000); // Match the transition time of body
 });
 
 
 
 // Creat new players
 const player1 = NewPlayer("Human");
-const player2 = NewPlayer("PC");
+let player2 = null
 
 // Create new ships
 const p1ship1 = NewShip(3);

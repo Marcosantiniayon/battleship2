@@ -8,7 +8,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    color: aliceblue;
+    color: rgb(209, 213, 216);
     position: relative;
     background-color: rgb(119, 119, 119);
     z-index: 1;
@@ -26,7 +26,6 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     z-index: -1;
-    /* Positioned behind content */
 }
 
 /* Dark overlay with transition effect */
@@ -37,22 +36,14 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(11, 12, 21, 0.7);
+    background: rgba(22, 22, 23, 0.75);
     opacity: 0;
-    transition: opacity 3.5s ease-in-out;
+    transition: opacity 2.5s ease-in-out;
 }
 
 /* When loaded, show the overlay */
 body.loaded .background-wrapper::before {
     opacity: 1;
-}
-
-/* Content wrapper for elements inside the body */
-.content {
-    position: relative;
-    z-index: 1;
-    padding: 20px;
-    text-align: center;
 }
 
 body::before {
@@ -63,25 +54,76 @@ body::before {
     right: 0;
     bottom: 0;
     background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
-    opacity: 0;
-    /* Initially transparent */
-    transition: opacity 2s ease-in-out;
-    /* Fade-in effect */
+    opacity: 0; /* Initially transparent */
+    transition: opacity 2s ease-in-out; /* Fade-in effect */
     z-index: 1;
 }
 body.loaded::before {
     opacity: 1;
-    /* Fully visible after loading */
 }
 
+/* Content wrapper for elements inside the body */
+.content {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+    padding: 20px;
+    text-align: center;
+}
+
+.menu{
+    border-radius: 8px;
+    padding: 20px 88px 40px 88px;
+    align-self: center;
+    background-color: rgba(255, 255, 255, 0.7);
+    opacity: 0; /* Initially transparent */
+    transition: opacity 1s ease-in-out;
+    display: flex;
+    flex-direction: column;    
+}
+.menu.visible {
+    opacity: 1;
+}
+h3{
+    font-size: 1.5REM;
+    color: rgba(48, 67, 111, 0.682);
+    text-shadow:
+        -1px -1px 0 #ffffff,
+        1px -1px 0 #ffffff,
+        -1px 1px 0 #ffffff,
+        1px 1px 0 #ffffff;
+}
 
 .heading{
     display: flex;
     justify-content: space-evenly;
     align-items: center;
+    opacity: 0; /* Initially transparent */
+    transition: opacity 2.5s ease-in-out;
+}
+.heading.visible{
+    opacity: 1;
+}
+.buttonsContainer{
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+}
+button{
+    width: 80px;
+    height: 30px;
+    border-radius: 8px;
+    border: none;
+    color: rgba(48, 67, 111, 0.682);
+    font-weight: 500;
+}
+button:hover{
+    transform: scale(1.2);
+    border: 2px solid rgba(48, 67, 111, 0.682);
 }
 
-button{
+#newGameBtn{
     display: none;
 }
 
@@ -94,15 +136,14 @@ button{
     flex-direction: row;
 }
 
-.menu {
-    padding: 24px;
-    flex: 1;
-    display: flex;
-}
-
 h1{
     text-align: center;
-    font-size: 3REM;
+    font-size: 5REM;
+    text-shadow:
+        -2px -2px 0 rgba(48, 67, 111, 0.682),
+        2px -2px 0 rgba(48, 67, 111, 0.682),
+        -2px 2px 0 rgba(48, 67, 111, 0.682),
+        2px 2px 0 rgba(48, 67, 111, 0.682);
 }
 
 .boardDiv{
@@ -168,7 +209,10 @@ h1{
         align-items: center;
         gap:40px
     }
-    /* .boardDiv {
-        width: 100%;
-    } */
+}
+
+@media (max-width: 468px) {
+    .menu {
+        padding: 20px 60px 40px 60px;
+    }
 }
