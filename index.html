@@ -15,22 +15,29 @@
             <h1>Naval Strike</h1>
             <button id="newGameBtn">New Game</button>
         </div>
-    
         <div class="menu">
-            <h3>Choose Opponent</h3>
-            <div class="buttonsContainer">
-                <button id="pcBtn">PC</button>
-                <button id="humanBtn">Human</button>
+            <div id="playerMenu">
+                <h3>Choose Opponent</h3>
+                <div id="oppSelectBtnsContainer">
+                    <button id="pcBtn" class="opponentBtn" data-type="pc">PC</button>
+                    <button id="humanBtn" class="opponentBtn" data-type="human">Human</button>
+                </div>
             </div>
+            <!-- <div id="shipMenu">
+                Logic for placing ships
+            </div> -->
+        </div>
+        <div class="menu2">
+
         </div>
     
         <div class="main">
             <div id="player1boardDiv" class="boardDiv">
-                <h3>Player</h3>
+                <h4>Player 1</h4>
                 <div id="player1board" class="gameboard"></div>
             </div>
             <div id="player2boardDiv" class="boardDiv">
-                <h3>Opponent</h3>
+                <h4>Player 2</h4>
                 <div id="player2board" class="gameboard"></div>
             </div>
         </div>
