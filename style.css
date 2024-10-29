@@ -45,7 +45,6 @@ body {
 body.loaded .background-wrapper::before {
     opacity: 1;
 }
-
 body::before {
     content: "";
     position: absolute;
@@ -72,34 +71,83 @@ body.loaded::before {
     text-align: center;
 }
 
+/* Divs within the content */
+.heading {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    opacity: 0;
+    /* Initially transparent */
+    transition: opacity 2.5s ease-in-out;
+}
+.heading.visible {
+    opacity: 1;
+}
+.main {
+    gap: 40px;
+    align-self: center;
+    padding: 24px;
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+}
+
+/* Menus */
 .menu{
     width: 400px;
+    height: 600px;
     padding: 20px 0px 40px 0px; 
     border-radius: 8px;
     align-self: center;
     background-color: rgba(255, 255, 255, 0.7);
     opacity: 0; /* Initially transparent */
-    transition: opacity .5s ease-in-out;
+    transition: opacity .75s ease-in-out;
     display: flex;
     flex-direction: column;    
+    justify-content: center;
 }
 .menu.visible {
     opacity: 1;
 }
 .menu.fade-out {
     opacity: 0;
-    transition: opacity 1s ease-in-out;
+    transition: opacity .5s ease-in-out;
     pointer-events: none; /* Prevent clicks during the fade */
-}
-#playerMenu {
-    opacity: 1;
-    transition: opacity 1s ease-in-out;
 }
 
+#playerMenu {
+    opacity: 1;
+    transition: opacity .5s ease-in-out;
+    align-items: center;
+    justify-items: center;
+}
 #playerMenu.fade-out {
     opacity: 0;
-    transition: opacity 1s ease-in-out;
+    transition: opacity .5s ease-in-out;
     pointer-events: none; /* Prevent clicks during the fade */
+}
+
+#shipsMenu{
+    display: none;
+    opacity: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+}
+#shipsMenu.fade-in{
+    opacity: 1;
+    transition: opacity .5s ease-in-out;
+}
+
+/* Heading Fonts */
+h1 {
+    text-align: center;
+    font-size: 5REM;
+    text-shadow:
+        -2px -2px 0 rgba(48, 67, 111, 0.682),
+        2px -2px 0 rgba(48, 67, 111, 0.682),
+        -2px 2px 0 rgba(48, 67, 111, 0.682),
+        2px 2px 0 rgba(48, 67, 111, 0.682);
 }
 h3{
     font-size: 1.5REM;
@@ -114,18 +162,13 @@ h4{
     font-size: 1.5REM;
 }
 
-
-.heading{
+/* Buttons */
+#oppSelectBtns{
     display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-    opacity: 0; /* Initially transparent */
-    transition: opacity 2.5s ease-in-out;
+    justify-content: center;
+    gap: 40px;
 }
-.heading.visible{
-    opacity: 1;
-}
-#oppSelectBtnsContainer{
+#shipsMenuBtns{
     display: flex;
     justify-content: center;
     gap: 40px;
@@ -142,37 +185,17 @@ button:not(:disabled):hover{
     transform: scale(1.2);
     border: 2px solid rgba(48, 67, 111, 0.682);
 }
-
 #newGameBtn{
     display: none;
 }
 
-.main {
-    gap: 40px;
-    align-self: center;
-    padding: 24px;
-    flex: 1;
-    display: flex;
-    flex-direction: row;
-}
-
-h1{
-    text-align: center;
-    font-size: 5REM;
-    text-shadow:
-        -2px -2px 0 rgba(48, 67, 111, 0.682),
-        2px -2px 0 rgba(48, 67, 111, 0.682),
-        -2px 2px 0 rgba(48, 67, 111, 0.682),
-        2px 2px 0 rgba(48, 67, 111, 0.682);
-}
-
+/* Gameboard elements */
 .boardDiv{
     display: none;
     width: 45%;
     margin: 0 auto;
     text-align: center;
 }
-
 .gameboard {
     margin-top: 20px;
     display: grid;
@@ -181,10 +204,6 @@ h1{
     gap: 1px;
     justify-content: center;
 }
-#player2gameboard{
-    /* display: none; */
-}
-
 .cell {
     width: 30px;
     height: 30px;
@@ -192,38 +211,29 @@ h1{
     background-color: rgba(209, 213, 216, .2);
 }
 
+/* board/ship states */
 .playerShip{
     background-color:rgba(171, 42, 42, .25);
     border: 2px solid rgb(171, 42, 42);
 }
-
 .attackHit{
     background-color: rgb(76, 195, 165)
 }
-
 .oppSunk{
     background-color: rgb(73, 221, 90)
 }
-
 .attackMiss{
     background-color: rgb(34, 34, 34)
 }
-
 .playerIsHit{
     background-color: rgba(171, 83, 42, 1);
 }
-
 .playerSunk{
     background-color: rgb(220, 64, 64);
     /* border: 2px solid rgb(109, 28, 28); */
 }
 
 /* Media Queries */
-.boardDiv {
-    margin: 0 auto;
-    text-align: center;
-}
-
 @media (max-width: 800px) {
     .main {
         flex-direction: column;
@@ -231,7 +241,6 @@ h1{
         gap:40px
     }
 }
-
 @media (max-width: 468px) {
     .menu {
         width: 300px;
