@@ -116,6 +116,9 @@ body.loaded::before {
 }
 
 #playerMenu {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     opacity: 1;
     transition: opacity .5s ease-in-out;
     align-items: center;
@@ -128,15 +131,17 @@ body.loaded::before {
 }
 
 #shipsMenu{
-    display: none;
-    opacity: 0;
+    display: flex;
+    visibility: hidden;
     flex-direction: column;
+    gap: 20px;
     align-items: center;
     justify-items: center;
+    opacity: 0;
 }
 #shipsMenu.fade-in{
     opacity: 1;
-    transition: opacity .5s ease-in-out;
+    transition: opacity .5s ease-in;
 }
 
 /* Heading Fonts */
@@ -151,6 +156,7 @@ h1 {
 }
 h3{
     font-size: 1.5REM;
+    margin: 0px;
     color: rgba(48, 67, 111, 0.682);
     text-shadow:
         -1px -1px 0 #ffffff,
