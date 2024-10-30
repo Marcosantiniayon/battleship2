@@ -230,32 +230,6 @@ const game = (() => {
         }
       }
     });
-    function canPlaceShip(board, x, y, length, orientation) {
-      // Check if ship is within bounds
-      if (orientation === "horizontal") {
-        if (y + length > 10) return false; // Out of bounds horizontally
-      } else if (orientation === "vertical") {
-        if (x + length > 10) return false; // Out of bounds vertically
-      }
-
-      // Check if any of the cells are already occupied by another ship
-      for (let i = 0; i < length; i++) {
-        let checkX = x;
-        let checkY = y;
-
-        if (orientation === "horizontal") {
-          checkY = y + i;
-        } else if (orientation === "vertical") {
-          checkX = x + i;
-        }
-
-        if (board[checkX][checkY] !== null) {
-          return false; // There's already a ship here
-        }
-      }
-
-      return true; // Ship can be placed
-    }
     function getRandomOrientation() {
       return Math.random() < 0.5 ? "horizontal" : "vertical";
     }
@@ -263,6 +237,30 @@ const game = (() => {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
   }
+  function canPlaceShip(board, x, y, length, orientation) {
+    // 1. Boundary Check
+    if (orientation === "horizontal" && y + length > 10) return false; // Out of bounds horizontally
+    if (orientation === "vertical" && x + length > 10) return false; // Out of bounds vertically
+
+    // 2. Overlap Check (Loop through each segment)
+    for (let i = 0; i < length; i++) {
+      let checkX = x;
+      let checkY = y;
+
+      if (orientation === "horizontal") {
+        checkY = y + i;
+      } else if (orientation === "vertical") {
+        checkX = x + i;
+      }
+
+      if (board[checkX][checkY] !== null) {
+        return false; // There's already a ship here
+      }
+    }
+
+    return true; // Ship can be placed
+  }
+
 
   // User Interface (Menus)
   function fadeOverlay() {
@@ -320,9 +318,10 @@ const game = (() => {
     // Display ships menu
     setTimeout(() => {
       shipsMenu.classList.add("fade-in");
+      shipsMenu.style.height = "auto";
+      shipsMenu.style.visibility = "visible";    
     }, 500);
-    shipsMenu.style.visibility = "visible";
-
+    
     // Btn Ev. Listeners
     orientationBtn.addEventListener("click", function () {});
     randomBtn.addEventListener("click", function () {});
@@ -330,8 +329,8 @@ const game = (() => {
       closeMenu();
 
       // Create & place ships on board
-      setPlayerShips(player1);
-      setPlayerShips(player2);
+      // setPlayerShips(player1);
+      // setPlayerShips(player2);
 
       // Render boards once menu is closed
       setTimeout(() => {
@@ -342,8 +341,10 @@ const game = (() => {
     // Functions for ship creation
     function createShipsBoard() {
       const player1ShipBoard = document.getElementById("player1ShipBoard");
+      player1ShipBoard.style.display = "grid";
       player1ShipBoard.innerHTML = ""; // Clear any existing board
 
+      // Create Cells (10x10) & Attach Listeners for highlight / placement
       for (let i = 0; i < 10; i++) {
         for (let j = 0; j < 10; j++) {
           const cell = document.createElement("div");
@@ -359,83 +360,72 @@ const game = (() => {
           player1ShipBoard.appendChild(cell);
         }
       }
-    }
-    function highlightCells(event) {
-      const x = parseInt(event.target.dataset.x);
-      const y = parseInt(event.target.dataset.y);
-      const length = shipSizes[currentShipIndex];
 
-      if (canPlaceShip(x, y, length, currentOrientation)) {
-        for (let i = 0; i < length; i++) {
-          let highlightCell;
-          if (currentOrientation === "horizontal") {
-            highlightCell = document.querySelector(
-              `[data-x='${x}'][data-y='${y + i}']`
-            );
-          } else {
-            highlightCell = document.querySelector(
-              `[data-x='${x + i}'][data-y='${y}']`
-            );
-          }
-          if (highlightCell) highlightCell.classList.add("highlight");
-        }
-      } else {
-        // Add some indication that placement is invalid
-        event.target.classList.add("invalid");
-      }
-    }
-    function removeHighlight(event) {
-      const cells = document.querySelectorAll(".highlight, .invalid");
-      cells.forEach((cell) => {
-        cell.classList.remove("highlight");
-        cell.classList.remove("invalid");
-      });
-    }
-    function placeShip(event) {
-      const x = parseInt(event.target.dataset.x);
-      const y = parseInt(event.target.dataset.y);
-      const length = shipSizes[currentShipIndex];
+      function highlightCells(event) {
+        const x = parseInt(event.target.dataset.x);
+        const y = parseInt(event.target.dataset.y);
+        const length = shipSizes[currentShipIndex];
+        const boardElement = document.getElementById("player1ShipBoard");
 
-      if (canPlaceShip(x, y, length, currentOrientation)) {
-        for (let i = 0; i < length; i++) {
-          let shipCell;
-          if (currentOrientation === "horizontal") {
-            shipCell = document.querySelector(
-              `[data-x='${x}'][data-y='${y + i}']`
-            );
-          } else {
-            shipCell = document.querySelector(
-              `[data-x='${x + i}'][data-y='${y}']`
-            );
+        if (canPlaceShip(currentPlayer.gameboard.board, x, y, length, currentOrientation)) {
+          for (let i = 0; i < length; i++) {
+            let highlightCell;
+            if (currentOrientation === "horizontal") {
+              highlightCell = document.querySelector(
+                `[data-x='${x}'][data-y='${y + i}']`
+              );
+            } else {
+              highlightCell = document.querySelector(
+                `[data-x='${x + i}'][data-y='${y}']`
+              );
+            }
+            if (highlightCell) highlightCell.classList.add("highlight");
           }
-          if (shipCell) shipCell.classList.add("playerShip"); // Mark cells as occupied by a ship
-        }
-        currentShipIndex++; // Move to the next ship
-        if (currentShipIndex >= shipSizes.length) {
-          alert("All ships placed! Click 'Ready' to start the game.");
-        }
-      }
-    }
-    function canPlaceShip(x, y, length, orientation) {
-      for (let i = 0; i < length; i++) {
-        let checkCell;
-        if (orientation === "horizontal") {
-          if (y + i >= 10) return false; // Out of bounds
-          checkCell = document.querySelector(
-            `[data-x='${x}'][data-y='${y + i}']`
-          );
         } else {
-          if (x + i >= 10) return false; // Out of bounds
-          checkCell = document.querySelector(
-            `[data-x='${x + i}'][data-y='${y}']`
-          );
-        }
-
-        if (checkCell && checkCell.classList.contains("playerShip")) {
-          return false; // Overlapping another ship
+          event.target.classList.add("invalid");
         }
       }
-      return true;
+      function removeHighlight(event) {
+        const cells = document.querySelectorAll(".highlight, .invalid");
+        cells.forEach((cell) => {
+          cell.classList.remove("highlight");
+          cell.classList.remove("invalid");
+        });
+      }
+      function placeShip(event) {
+        const x = parseInt(event.target.dataset.x);
+        const y = parseInt(event.target.dataset.y);
+        const length = shipSizes[currentShipIndex];
+        const orientation = currentOrientation; 
+        console.log('currentplayer: ',currentPlayer);
+
+        // Use the internal board representation to check if placement is possible
+        if (canPlaceShip(currentPlayer.gameboard.board, x, y, length, currentOrientation)) {
+          
+          // Place the ship on the internal board
+          const ship = Ship(length);
+          currentPlayer.gameboard.placeShip(ship, x, y, orientation);
+
+          // Update the DOM to visually reflect the placement
+          for (let i = 0; i < length; i++) {
+            let shipCell;
+            if (currentOrientation === "horizontal") {
+              shipCell = document.querySelector(
+                `[data-x='${x}'][data-y='${y + i}']`
+              );
+            } else {
+              shipCell = document.querySelector(
+                `[data-x='${x + i}'][data-y='${y}']`
+              );
+            }
+            if (shipCell) shipCell.classList.add("playerShip"); // Mark cells as occupied by a ship
+          }
+          currentShipIndex++; // Move to the next ship
+          if (currentShipIndex > shipSizes.length) {
+            alert("All ships placed! Click 'Ready' to start the game.");
+          }
+        }
+      }
     }
   }
   function closeMenu() {

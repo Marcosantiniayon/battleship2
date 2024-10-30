@@ -132,6 +132,7 @@ body.loaded::before {
 
 #shipsMenu{
     display: flex;
+    height: 0px;
     visibility: hidden;
     flex-direction: column;
     gap: 20px;
@@ -237,6 +238,9 @@ button:not(:disabled):hover{
 .playerSunk{
     background-color: rgb(220, 64, 64);
     /* border: 2px solid rgb(109, 28, 28); */
+}
+.highlight{
+    background-color: rgb(201, 161, 82);
 }
 
 /* Media Queries */
