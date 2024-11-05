@@ -24,8 +24,11 @@
                 </div>
             </div>
             <div id="shipsMenu">
-                <h3>Place Your Ships</h3>
+                <h3 id="placeShipsH3">Player 1: Place Your Ships</h3>
                 <div class="gameboard" id="player1ShipBoard">
+                    <!-- Dinamnically create board -->
+                </div>
+                <div class="gameboard" id="player2ShipBoard">
                     <!-- Dinamnically create board -->
                 </div>
                 <div id="shipsMenuBtns">
@@ -35,7 +38,11 @@
                 <button id="readyBtn">Ready</button>
             </div>
         </div>
-        <div class="main">
+        <div id="switchPlayerDiv">
+            <h4 id="switchPlayersH4"></h4>
+            <button id="readyToSwitchBtn">Ready</button>
+        </div>
+        <div id="main">
             <div id="player1boardDiv" class="boardDiv">
                 <h4>Player 1</h4>
                 <div id="player1board" class="gameboard"></div>
