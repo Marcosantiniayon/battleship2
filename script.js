@@ -172,13 +172,17 @@ const game = (() => {
       const x = event.target.dataset.x;
       const y = event.target.dataset.y;
 
+      // Handle attacks & mark clicked
       oppGameboard.receiveAttack(i, j);
       oppGameboard.markCellAsClicked(i, j);
+
       renderGameboard();
 
-
-      switchPlayer();
-      changePlayer(oppGameboard, i, j);
+      // Switch Player if Clicked Cell is a miss
+      if (oppGameboard.isMissAt(i, j)) {
+        switchPlayer();
+        changePlayer(oppGameboard, i, j);
+      }
     });
   }
   function changePlayer(oppGameboard, i, j) {
@@ -276,6 +280,8 @@ const game = (() => {
     oppSelectBtns.addEventListener("click", function (event) {
       // Get the opponent type from the data-type attribute
       const opponentType = event.target.getAttribute("data-type");
+
+      // Set player 2 type
       if (opponentType === "pc") {
         player2.type = "pc";
       } else if (opponentType === "human") {
@@ -283,8 +289,6 @@ const game = (() => {
       } else {
         console.log("invalid type");
       }
-
-      console.log("player 2 type = ", player2.type);
 
       closePlayerMenu();
       openShipsMenu();
@@ -334,7 +338,6 @@ const game = (() => {
         h3.innerHTML = "Player 2: Place Your Ships";
         currentShipIndex = 0; // Reset Index for ship length
         createShipsBoard(player2);
-        console.log("2: ", currentShipIndex);
       } else if (player2.type === "pc") {
         randomPlayerShips(player2, length);
         bothReady = true;
@@ -344,6 +347,10 @@ const game = (() => {
         bothReady = true; // Will make true after the first click. 2nd click will process as true
       } else {
         closeMenuAndRenderGame();
+        const switchPlayersMsg = document.getElementById("switchPlayersH4");
+        setTimeout(() => {
+          switchPlayersMsg.style.visibility = "visible";
+        }, 500); // .5 sec delay
       }
     });
 
@@ -364,14 +371,12 @@ const game = (() => {
         // player 1 board = active
         playerShipBoard = player1ShipBoard;
         player2ShipBoard.style.display = "none"; //Hide board
-        console.log("player1");
       } else if (player === player2) {
         // player 2 board = active
         playerShipBoard = player2ShipBoard;
         player1ShipBoard.style.display = "none"; //Hide board
-        console.log("player2");
       } else {
-        console.log("player: ", player);
+        // console.log("player: ", player);
       }
 
       //Display curret player shipboard
@@ -459,11 +464,9 @@ const game = (() => {
             if (shipCell) shipCell.classList.add("playerShip"); // Mark cells as occupied by a ship
           }
           currentShipIndex++; // Move to the next ship
-          console.log("current index: ", currentShipIndex);
           if (currentShipIndex > shipSizes.length) {
             alert("All ships placed! Click 'Ready' to start the game.");
           }
-          console.log("length:", length);
         }
       }
     }
@@ -477,27 +480,34 @@ const game = (() => {
   }
   function switchPlayer() {
     const mainDiv = document.getElementById("main");
-    const switchPlayersH4 = document.getElementById("switchPlayersH4");
-    const switchPlayerDiv = document.getElementById("switchPlayerDiv");
+    const switchPlayersMsg = document.getElementById("switchPlayersH4");
     const readyToSwitchBtn = document.getElementById("readyToSwitchBtn");
 
-    // Update Player's Turn Message
-    if (currentPlayer === player1) {
-      switchPlayersH4.innerHTML = "Player 2's Turn"
-    } else if (currentPlayer === player2) {
-      switchPlayersH4.innerHTML = "Player 1's Turn";
+
+    // Check if Human or PC opponent for proper switch action
+    if (player2.type === "human") {
+      console.log("human shit");
+      // Update player's turn message, hide boars, & make Ready Btn visible
+      if (currentPlayer === player1) {
+        switchPlayersMsg.innerHTML = "Player 2's Turn";
+      } else if (currentPlayer === player2) {
+        switchPlayersMsg.innerHTML = "Player 1's Turn";
+      }
+      mainDiv.style.visibility = "hidden";
+      readyToSwitchBtn.style.visibility = "visible";
+    } else if (player2.type === "pc") {
+      console.log('pc')
+      // Update pc's turn message & add buffer
+      switchPlayersMsg.innerHTML = "PC making move...";
+      setTimeout(() => {
+        switchPlayersMsg.innerHTML = "Player 1's Turn";
+        console.log("This is delayed by 1.5 seconds");
+      }, 1500);
     }
 
-    // Hide Main Div (Boards)
-    mainDiv.style.visibility = "hidden";
-    switchPlayerDiv.style.visibility = "visible";
-    switchPlayerDiv.style.height = "auto";
-
-  
-    // When Ready Button in clicked, hide SwitchPlayer Message & Show Main (Boards)
     readyToSwitchBtn.addEventListener("click", () => {
-      switchPlayerDiv.style.visibility = "hidden";
-      switchPlayerDiv.style.height = "0px";
+      // When Ready Button in clicked, hide Btn, & show Main (Boards)
+      readyToSwitchBtn.style.visibility = "none";
       mainDiv.style.visibility = "visible";
     });
   }

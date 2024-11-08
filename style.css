@@ -144,13 +144,19 @@ body.loaded::before {
     transition: opacity .5s ease-in;
 }
 #switchPlayerDiv{
-    visibility: hidden;
-    height: 0px;
+    /* visibility: hidden;
+    height: 0px; */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
+#readyToSwitchBtn, #switchPlayersH4{
+    visibility: hidden;
+}
+
+
+
 
 /* Heading Fonts */
 h1 {
