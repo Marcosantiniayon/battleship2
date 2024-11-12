@@ -18,21 +18,46 @@ const game = (() => {
     // Initiate gameboards & gameboard elements
     const playerGameboard = currentPlayer.gameboard;
     const oppGameboard = opponent.gameboard;
+
     let playerGameBoardElement = document.getElementById("player1boardDiv");
     let oppGameboardElement = document.getElementById("player2boardDiv");
+    
     let player1BoardElement = document.getElementById("player1board");
     let player2BoardElement = document.getElementById("player2board");
 
     //Display gameboard elements
     playerGameBoardElement.style.display = "block";
     oppGameboardElement.style.display = "block";
-
-    if (currentPlayer === player1) {
+     
+    if (currentPlayer === player1 && player2.type !== "pc") {
+      // Human vs Human (player 1's turn)
+      console.log("1");
       playerGameBoardElement = player1BoardElement;
       oppGameboardElement = player2BoardElement;
-    } else if (currentPlayer === player2) {
+      oppGameboardElement.classList.remove("off");
+      playerGameBoardElement.classList.add("off");
+    } else if (currentPlayer === player2 && player2.type !== "pc") {
+      // Human vs Human (player 2's turn)
+      console.log("2");
+      console.log(currentPlayer.type);
       playerGameBoardElement = player2BoardElement;
       oppGameboardElement = player1BoardElement;
+      oppGameboardElement.classList.remove("off");
+      playerGameBoardElement.classList.add("off");
+    } else if (currentPlayer === player1 && player2.type === "pc") {
+      // Human vs PC (player 1's turn)
+      console.log("3");
+      playerGameBoardElement = player1BoardElement;
+      oppGameboardElement = player2BoardElement;
+      oppGameboardElement.classList.remove("off");
+      playerGameBoardElement.classList.add("off");
+    } else if (currentPlayer === player2 && player2.type === "pc") {
+      // Human vs PC (pc's turn)
+      console.log("4");
+      playerGameBoardElement = player1BoardElement;
+      oppGameboardElement = player2BoardElement;
+      oppGameboardElement.classList.add("off");
+      playerGameBoardElement.classList.remove("off");
     }
 
     // Clear the player board containers
@@ -48,7 +73,7 @@ const game = (() => {
         cell.dataset.y = j;
 
         // Mark cells on gameboard based on state
-        if (playerGameboard.isShipAt(i, j)) {
+        if (currentPlayer.type === "human" && playerGameboard.isShipAt(i, j)) {
           cell.classList.add("playerShip");
         }
         if (playerGameboard.isHitAt(i, j)) {
@@ -100,54 +125,56 @@ const game = (() => {
   }
   function pcClicks() {
     if (currentPlayer === player2 && player2.type == "pc") {
-      // Check if there are cells to target around a known hit
-      if (potentialTargets.length > 0) {
-        const nextTarget = potentialTargets.shift();
-        const { x, y } = nextTarget;
-
-        if (!opponent.gameboard.isCellClicked(x, y)) {
-          opponent.gameboard.receiveAttack(x, y);
-          opponent.gameboard.markCellAsClicked(x, y);
-
-          if (opponent.gameboard.isShipAt(x, y)) {
-            lastHit = { x, y }; // Track the successful hit
-            addPotentialTargets(x, y); // Add adjacent cells to potential targets
-          } else {
-            lastHit = null; // Reset if it was a miss
-          }
-          // PC Move buffer...
-          changePlayer(opponent.gameboard, x, y);
-          return;
-        }
-      } else if (!potentialTargets.length > 0) {
-        // If no specific target, choose a random cell
-        let validMove = false; // Look for random until a valid one is found & clicked. 
-        while (!validMove) {
-          const x = Math.floor(Math.random() * 10);
-          const y = Math.floor(Math.random() * 10);
-
-          // Check if cell at x & y has already been clicked
+      setTimeout(() => {
+        // Check if there are cells to target around a known hit
+        if (potentialTargets.length > 0) {
+          const nextTarget = potentialTargets.shift();
+          const { x, y } = nextTarget;
+          // Click cell, if it hasn't been yet attacked
           if (!opponent.gameboard.isCellClicked(x, y)) {
-            // If not previously clicked, mark attack & click
             opponent.gameboard.receiveAttack(x, y);
             opponent.gameboard.markCellAsClicked(x, y);
 
-            validMove = true; 
-
-            // If random click resulted in a hit, push it to last hit list
             if (opponent.gameboard.isShipAt(x, y)) {
-              lastHit = { x, y };
-              addPotentialTargets(x, y);
+              lastHit = { x, y }; // Track the successful hit
+              addPotentialTargets(x, y); // Add adjacent cells to potential targets
             } else {
-              lastHit = null;
+              lastHit = null; // Reset if it was a miss
             }
-
-            // PC Move Buffer
             changePlayer(opponent.gameboard, x, y);
+            return;
+          }
+        } else if (potentialTargets.length === 0) {
+          // If no specific target, choose a random cell
+          let validMove = false; // Look for random until a valid one is found & clicked.
+          while (!validMove) {
+            const x = Math.floor(Math.random() * 10);
+            const y = Math.floor(Math.random() * 10);
+
+            // Check if cell at x & y has already been clicked
+            if (!opponent.gameboard.isCellClicked(x, y)) {
+              // If not previously clicked, mark attack & click
+              opponent.gameboard.receiveAttack(x, y);
+              opponent.gameboard.markCellAsClicked(x, y);
+
+              validMove = true;
+
+              // If random click resulted in a hit, push it to last hit list
+              if (opponent.gameboard.isShipAt(x, y)) {
+                lastHit = { x, y };
+                addPotentialTargets(x, y);
+              } else {
+                lastHit = null;
+              }
+
+              // PC Move Buffer
+              changePlayer(opponent.gameboard, x, y);
+            }
           }
         }
-      }
-    } 
+      }, 1000); // Add a delay of 1.5 seconds before the PC makes its move.
+    }
+
     function addPotentialTargets(x, y) {
       // Add adjacent cells to the potential targets array, ensuring they're within bounds
       const adjacentCells = [
@@ -178,9 +205,9 @@ const game = (() => {
 
       renderGameboard();
 
+
       // Switch Player if Clicked Cell is a miss
       if (oppGameboard.isMissAt(i, j)) {
-        switchPlayer();
         changePlayer(oppGameboard, i, j);
       }
     });
@@ -190,16 +217,19 @@ const game = (() => {
       // Player 1 hit. Still player 1's turn
       currentPlayer = player1;
       opponent = player2;
+      console.log("curr player: ", currentPlayer.type);
       // console.log(`Player 1 hit. Still player 1's turn. Type:`,currentPlayer);
     } else if (currentPlayer === player1 && !oppGameboard.isHitAt(i, j)) {
       // Player 1 miss. Player 2's turn
       currentPlayer = player2;
       opponent = player1;
+      console.log("curr player: ", currentPlayer.type);
       // console.log(`Player 1 miss. Player 2's turn. Type:`, currentPlayer);
     } else if (currentPlayer === player2 && oppGameboard.isHitAt(i, j)) {
       // Player 2 hit. Still player 2's turn
       currentPlayer = player2;
       opponent = player1;
+      console.log("curr player: ", currentPlayer.type);
       // console.log(`Player 2 hit. Still player 2's turn. Type:`,currentPlayer);
     } else if (currentPlayer === player2 && !oppGameboard.isHitAt(i, j)) {
       // Player 2 miss. Player 1's turn
@@ -207,8 +237,9 @@ const game = (() => {
       opponent = player2;
       // console.log(`Player 2 miss. Player 1's turn. Type:`, currentPlayer);
     }
-    // Re-render board
-    renderGameboard();
+
+    switchPlayer(); // switch player message
+    renderGameboard(); // Re-render board
   }
   function randomPlayerShips(player, length) {
     const shipLengths = [5, 4, 3, 3, 2];
@@ -483,7 +514,6 @@ const game = (() => {
     const switchPlayersMsg = document.getElementById("switchPlayersH4");
     const readyToSwitchBtn = document.getElementById("readyToSwitchBtn");
 
-
     // Check if Human or PC opponent for proper switch action
     if (player2.type === "human") {
       console.log("human shit");
@@ -496,13 +526,12 @@ const game = (() => {
       mainDiv.style.visibility = "hidden";
       readyToSwitchBtn.style.visibility = "visible";
     } else if (player2.type === "pc") {
-      console.log('pc')
-      // Update pc's turn message & add buffer
-      switchPlayersMsg.innerHTML = "PC making move...";
-      setTimeout(() => {
+      if (currentPlayer === player1) {
         switchPlayersMsg.innerHTML = "Player 1's Turn";
-        console.log("This is delayed by 1.5 seconds");
-      }, 1500);
+      } else if (currentPlayer === player2){
+        switchPlayersMsg.innerHTML = "PC making move...";
+      }
+
     }
 
     readyToSwitchBtn.addEventListener("click", () => {

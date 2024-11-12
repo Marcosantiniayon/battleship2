@@ -157,7 +157,6 @@ body.loaded::before {
 
 
 
-
 /* Heading Fonts */
 h1 {
     text-align: center;
@@ -229,6 +228,10 @@ button:not(:disabled):hover{
     height: 30px;
     border: 1px solid #c3c3c3;
     background-color: rgba(209, 213, 216, .2);
+}
+.off{
+    pointer-events: none;
+    opacity: .5;
 }
 
 /* board/ship states */
