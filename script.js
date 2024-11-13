@@ -19,52 +19,55 @@ const game = (() => {
     const playerGameboard = currentPlayer.gameboard;
     const oppGameboard = opponent.gameboard;
 
-    let playerGameBoardElement = document.getElementById("player1boardDiv");
-    let oppGameboardElement = document.getElementById("player2boardDiv");
-    
-    let player1BoardElement = document.getElementById("player1board");
-    let player2BoardElement = document.getElementById("player2board");
+    const player1BoardElement = document.getElementById("player1board");
+    const player2BoardElement = document.getElementById("player2board");
+    const player1BoardDivElement = document.getElementById("player1boardDiv");
+    const player2BoardDivElement = document.getElementById("player2boardDiv");
 
-    //Display gameboard elements
-    playerGameBoardElement.style.display = "block";
-    oppGameboardElement.style.display = "block";
-     
+    // Show both board divs
+    player1BoardDivElement.style.display = "block";
+    player2BoardDivElement.style.display = "block";
+
+    // Determine which boards should be active/inactive based on the current player
     if (currentPlayer === player1 && player2.type !== "pc") {
       // Human vs Human (player 1's turn)
-      console.log("1");
-      playerGameBoardElement = player1BoardElement;
-      oppGameboardElement = player2BoardElement;
-      oppGameboardElement.classList.remove("off");
-      playerGameBoardElement.classList.add("off");
+      activatePlayerBoard(player2BoardElement);
+      deactivatePlayerBoard(player1BoardElement);
     } else if (currentPlayer === player2 && player2.type !== "pc") {
       // Human vs Human (player 2's turn)
-      console.log("2");
-      console.log(currentPlayer.type);
-      playerGameBoardElement = player2BoardElement;
-      oppGameboardElement = player1BoardElement;
-      oppGameboardElement.classList.remove("off");
-      playerGameBoardElement.classList.add("off");
+      activatePlayerBoard(player1BoardElement);
+      deactivatePlayerBoard(player2BoardElement);
     } else if (currentPlayer === player1 && player2.type === "pc") {
       // Human vs PC (player 1's turn)
-      console.log("3");
-      playerGameBoardElement = player1BoardElement;
-      oppGameboardElement = player2BoardElement;
-      oppGameboardElement.classList.remove("off");
-      playerGameBoardElement.classList.add("off");
+      activatePlayerBoard(player2BoardElement);
+      // deactivatePlayerBoard(player1BoardElement);
     } else if (currentPlayer === player2 && player2.type === "pc") {
-      // Human vs PC (pc's turn)
-      console.log("4");
-      playerGameBoardElement = player1BoardElement;
-      oppGameboardElement = player2BoardElement;
-      oppGameboardElement.classList.add("off");
-      playerGameBoardElement.classList.remove("off");
+      // Human vs PC (PC's turn)
+      deactivatePlayerBoard(player2BoardElement);
+      // activatePlayerBoard(player1BoardElement);
     }
 
-    // Clear the player board containers
-    oppGameboardElement.innerHTML = "";
-    playerGameBoardElement.innerHTML = "";
+    // Clear both board elements to prepare for rendering
+    player1BoardElement.innerHTML = "";
+    player2BoardElement.innerHTML = "";
 
-    // Player physical board (10 x 10) & mark defensive cell state. No click listeners
+    // Render the player's board
+    renderPlayerBoard(player1BoardElement, playerGameboard);
+
+    // Render the opponent's board with click listeners
+    renderOpponentBoard(player2BoardElement, oppGameboard);
+
+    // Check if it is the PC's turn and apply random click plays if so
+    pcClicks();
+  }
+  function activatePlayerBoard(boardElement) {
+    boardElement.classList.remove("off");
+  }
+  function deactivatePlayerBoard(boardElement) {
+    boardElement.classList.add("off");
+  }
+  function renderPlayerBoard(boardElement, gameboard) {
+    // Loop through the player's gameboard and add cells
     for (let i = 0; i < 10; i++) {
       for (let j = 0; j < 10; j++) {
         const cell = document.createElement("div");
@@ -72,24 +75,25 @@ const game = (() => {
         cell.dataset.x = i;
         cell.dataset.y = j;
 
-        // Mark cells on gameboard based on state
-        if (currentPlayer.type === "human" && playerGameboard.isShipAt(i, j)) {
+        // Mark cells based on the game state
+        if (currentPlayer.type === "human" && gameboard.isShipAt(i, j)) {
           cell.classList.add("playerShip");
         }
-        if (playerGameboard.isHitAt(i, j)) {
+        if (gameboard.isHitAt(i, j)) {
           cell.classList.add("playerIsHit");
         }
-        const playerShip = playerGameboard.getShipAt(i, j);
+        const playerShip = gameboard.getShipAt(i, j);
         if (playerShip && playerShip.isSunk()) {
           cell.classList.add("playerSunk");
         }
 
-        // Add the cell to the board and apply click listeners
-        playerGameBoardElement.appendChild(cell);
+        // Append the cell to the board
+        boardElement.appendChild(cell);
       }
     }
-
-    // Opponent physical board (10 x 10) & mark attacking cell state. Add click listeners
+  }
+  function renderOpponentBoard(boardElement, gameboard) {
+    // Loop through the opponent's gameboard and add cells
     for (let i = 0; i < 10; i++) {
       for (let j = 0; j < 10; j++) {
         const cell = document.createElement("div");
@@ -97,31 +101,33 @@ const game = (() => {
         cell.dataset.x = i;
         cell.dataset.y = j;
 
-        // Mark cells on gameboard based on state
-        if (oppGameboard.isHitAt(i, j)) {
+        // Mark cells based on the game state
+        if (gameboard.isHitAt(i, j)) {
           cell.classList.add("attackHit");
         }
-        if (oppGameboard.isMissAt(i, j)) {
+        if (gameboard.isMissAt(i, j)) {
           cell.classList.add("attackMiss");
         }
-        const opponentShip = oppGameboard.getShipAt(i, j);
+        const opponentShip = gameboard.getShipAt(i, j);
         if (opponentShip && opponentShip.isSunk()) {
           cell.classList.add("oppSunk");
-          console.log("opp ship sunk!");
         }
 
-        // Add the cell to the board and apply click listeners
-        oppGameboardElement.appendChild(cell);
+        // Append the cell to the board
+        boardElement.appendChild(cell);
 
-        // Only add click listeners if the cell hasn't already been clicked (hit or miss)
-        if (!oppGameboard.isCellClicked(i, j)) {
-          addBoardClickListeners(playerGameboard, oppGameboard, cell, i, j);
+        // Add click listeners only if the cell hasn't been clicked yet
+        if (!gameboard.isCellClicked(i, j)) {
+          addBoardClickListeners(
+            currentPlayer.gameboard,
+            gameboard,
+            cell,
+            i,
+            j
+          );
         }
       }
     }
-
-    // Check if it is the PC's turn and apply random click plays if so
-    pcClicks();
   }
   function pcClicks() {
     if (currentPlayer === player2 && player2.type == "pc") {

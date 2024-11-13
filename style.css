@@ -217,7 +217,7 @@ button:not(:disabled):hover{
 }
 .gameboard {
     margin-top: 20px;
-    display: none;
+    /* display: none; */
     grid-template-columns: repeat(10, 30px);
     grid-template-rows: repeat(10, 30px);
     gap: 1px;
