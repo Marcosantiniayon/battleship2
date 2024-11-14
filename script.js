@@ -286,35 +286,6 @@ const game = (() => {
     switchPlayer(); // switch player message
     renderGameboard(); // Re-render board
   }
-  function randomPlayerShips(player, length) {
-    const shipLengths = [5, 4, 3, 3, 2];
-
-    shipLengths.forEach((length) => {
-      let placed = false;
-      // Keep trying random positions and orientations until the ship is placed in a valid position
-      while (!placed) {
-        //Generate random position and orientations
-        const x = getRandomInt(0, 9);
-        const y = getRandomInt(0, 9);
-        const orientation = getRandomOrientation();
-
-        // Check if ship can be placed & place if valid
-        if (canPlaceShip(player.gameboard.board, x, y, length, orientation)) {
-          const ship = Ship(length);
-          player.gameboard.placeShip(ship, x, y, orientation);
-          placed = true;
-        }
-      }
-    });
-
-    // Helper functions
-    function getRandomOrientation() {
-      return Math.random() < 0.5 ? "horizontal" : "vertical";
-    }
-    function getRandomInt(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-  }
   function canPlaceShip(board, x, y, length, orientation) {
     // 1. Boundary Check
     if (orientation === "horizontal" && y + length > 10) return false; // Out of bounds horizontally
@@ -391,7 +362,7 @@ const game = (() => {
     const orientationBtn = document.getElementById("orientationBtn");
     const randomBtn = document.getElementById("randomBtn");
     const readyBtn = document.getElementById("readyBtn");
-
+    let currentlyPlacingShips = player1;
     let bothReady = false;
 
     // Define ship sizes
@@ -411,15 +382,36 @@ const game = (() => {
     }, 500);
 
     // Btn Ev. Listeners
-    orientationBtn.addEventListener("click", function () {});
-    randomBtn.addEventListener("click", function () {});
+    orientationBtn.addEventListener("click", function () {
+      if (currentOrientation === "horizontal") {
+        currentOrientation = "vertical";
+        orientationBtn.innerHTML = "Horizontal"
+      } else if (currentOrientation === "vertical") {
+        currentOrientation = "horizontal";
+        orientationBtn.innerHTML = "Vertical";
+      }
+    });
+    randomBtn.addEventListener("click", function () {
+      console.log('clickled')
+      if (currentlyPlacingShips === player1) {
+        console.log('1')
+        randomPlayerShips(player1, length);
+      } else if (currentlyPlacingShips === player2) {
+        console.log("2");
+        randomPlayerShips(player2, length);
+      }
+
+    });
     readyBtn.addEventListener("click", function () {
       // shipsMenu for player 2 if 'human'
       if (player2.type === "human") {
         const h3 = document.getElementById("placeShipsH3");
         h3.innerHTML = "Player 2: Place Your Ships";
         currentShipIndex = 0; // Reset Index for ship length
+        currentOrientation = "horizontal"; // Reset Orientation
+        orientationBtn.innerHTML = "Horizontal"; // Reset Orientation Btn Txt
         createShipsBoard(player2);
+        currentlyPlacingShips = player2;
       } else if (player2.type === "pc") {
         randomPlayerShips(player2, length);
         bothReady = true;
@@ -428,26 +420,61 @@ const game = (() => {
       if (!bothReady) {
         bothReady = true; // Will make true after the first click. 2nd click will process as true
       } else {
-        closeMenuAndRenderGame();
-      }
+        // Close Menu
+        const menu = document.querySelector(".menu");
+        menu.classList.add("fade-out");
+        setTimeout(() => {
+          menu.style.display = "none";
+        }, 500);
+
+        // Render Game
+        setTimeout(() => {
+          const mainDiv = document.getElementById("main");
+          mainDiv.style.display = "flex";
+          const gameboards = document.querySelectorAll(".gameboard");
+          for (const gameboard of gameboards) {
+            gameboard.style.display = "grid";
+          }
+          renderGameboard();
+          switchPlayerDiv.style.visibility = "visible";
+          readyToSwitchBtn.style.display = "block";
+        }, 500);
+      }        
     });
 
-    function closeMenuAndRenderGame() {
-      closeMenu();
-      setTimeout(() => {
-        const mainDiv = document.getElementById("main");
-        mainDiv.style.display = "flex";
-        const gameboards = document.querySelectorAll(".gameboard");
-        for (const gameboard of gameboards) {
-          gameboard.style.display = "grid";
-        }
-        renderGameboard();
-        switchPlayerDiv.style.visibility = "visible";
-        readyToSwitchBtn.style.display = "block";
-      }, 500);
-    }
-
     // Functions for ship creation
+    function randomPlayerShips(player, length) {
+      clearShips(player); // Clear old ships if any
+
+      const shipLengths = [5, 4, 3, 3, 2];
+
+      shipLengths.forEach((length) => {
+        let placed = false;
+        // Keep trying random positions and orientations until the ship is placed in a valid position
+        while (!placed) {
+          //Generate random position and orientations
+          const x = getRandomInt(0, 9);
+          const y = getRandomInt(0, 9);
+          const orientation = getRandomOrientation();
+
+          // Check if ship can be placed & place if valid
+          if (canPlaceShip(player.gameboard.board, x, y, length, orientation)) {
+            const ship = Ship(length);
+            player.gameboard.placeShip(ship, x, y, orientation);
+            placed = true;
+            showPlacedShips(x, y, length); 
+          }
+        }
+      });
+
+      // Helper functions
+      function getRandomOrientation() {
+        return Math.random() < 0.5 ? "horizontal" : "vertical";
+      }
+      function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+    }
     function createShipsBoard(player) {
       if (player === player1) {
         // player 1 board = active
@@ -545,6 +572,7 @@ const game = (() => {
             }
             if (shipCell) shipCell.classList.add("playerShip"); // Mark cells as occupied by a ship
           }
+          showPlacedShips();
           currentShipIndex++; // Move to the next ship
           if (currentShipIndex > shipSizes.length) {
             alert("All ships placed! Click 'Ready' to start the game.");
@@ -552,13 +580,38 @@ const game = (() => {
         }
       }
     }
-  }
-  function closeMenu() {
-    const menu = document.querySelector(".menu");
-    menu.classList.add("fade-out");
-    setTimeout(() => {
-      menu.style.display = "none";
-    }, 500);
+    function showPlacedShips(x, y, length) {
+      // Update the DOM to visually reflect the placement
+      for (let i = 0; i < length; i++) {
+        let shipCell;
+        if (currentOrientation === "horizontal") {
+          shipCell = playerShipBoard.querySelector(
+            `[data-x='${x}'][data-y='${y + i}']`
+          );
+        } else {
+          shipCell = playerShipBoard.querySelector(
+            `[data-x='${x + i}'][data-y='${y}']`
+          );
+        }
+        if (shipCell) shipCell.classList.add("playerShip"); // Mark cells as occupied by a ship
+      }
+    }
+    function clearShips(player) {
+      // Clear from internal gameboard representation
+      player.gameboard.removeShips();
+
+      // Clear ship representation from the DOM.
+      let playerShipBoard;
+      if (player === player1) {
+        playerShipBoard = player1ShipBoard;
+      } else {
+        playerShipBoard = player2ShipBoard;
+      }
+      const shipCells = playerShipBoard.querySelectorAll(".playerShip");
+      shipCells.forEach((cell) => {
+        cell.classList.remove("playerShip"); // Remove the ship marker class from each cell
+      });
+    }
   }
   function switchPlayer() {
     // Check if Human or PC opponent for proper switch action
@@ -693,6 +746,15 @@ function Gameboard() {
     // Add the ship to the list of ships on the board (assuming `ships` is an array)
     ships.push(ship);
   }
+  function removeShips() {
+    ships.length = 0; // Clear ships array
+    // Reset the internal board representation
+    for (let i = 0; i < board.length; i++) {
+      for (let j = 0; j < board[i].length; j++) {
+        board[i][j] = null; // Reset all cells to null (i is the row, j is the column)
+      }
+    }
+  }
   function isShipAt(x, y) {
     return board[x][y] !== null;
   }
@@ -736,6 +798,7 @@ function Gameboard() {
     isHitAt,
     isMissAt,
     placeShip,
+    removeShips,
     isShipAt,
     getShipAt,
     receiveAttack,
