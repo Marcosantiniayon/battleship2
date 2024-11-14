@@ -88,7 +88,7 @@ body.loaded::before {
     align-self: center;
     padding: 24px;
     flex: 1;
-    display: flex;
+    display: none;
     flex-direction: row;
 }
 
@@ -144,15 +144,20 @@ body.loaded::before {
     transition: opacity .5s ease-in;
 }
 #switchPlayerDiv{
-    /* visibility: hidden;
-    height: 0px; */
+    /* height: 16px;  */
     display: flex;
+    visibility: hidden;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
-#readyToSwitchBtn, #switchPlayersH4{
+#readyToSwitchBtn{
+    display: none;
     visibility: hidden;
+}
+#switchPlayersH4{
+    color: #85bce4;
+    text-shadow: 0px 0px 20px #058bff;
 }
 
 
@@ -166,6 +171,7 @@ h1 {
         2px -2px 0 rgba(48, 67, 111, 0.682),
         -2px 2px 0 rgba(48, 67, 111, 0.682),
         2px 2px 0 rgba(48, 67, 111, 0.682);
+    margin-bottom: 32px;
 }
 h3{
     font-size: 1.5REM;
@@ -210,10 +216,13 @@ button:not(:disabled):hover{
 
 /* Gameboard elements */
 .boardDiv{
-    display: none;
+    /* display: none; */
     width: 45%;
     margin: 0 auto;
     text-align: center;
+}
+.boardDivH4{
+    /* display: none; */
 }
 .gameboard {
     margin-top: 20px;
@@ -231,7 +240,22 @@ button:not(:disabled):hover{
 }
 .off{
     pointer-events: none;
-    opacity: .5;
+    /* opacity: .5; */
+}
+.on1{
+    border: 2px solid #d7eaffd4;
+    box-shadow: 0 0 50px 10px rgb(72 163 223 / 35%);
+    width: fit-content;
+}
+.on2{
+    border: 2px solid #ffcfcfd5;
+    box-shadow: 0 0 50px 10px rgb(223 72 72 / 35%);
+    width: fit-content;
+}
+.on3 {
+    border: 2px solid #fdffd8c7;
+    box-shadow: 0 0 50px 10px rgb(223 206 72 / 35%);
+    width: fit-content;
 }
 
 /* board/ship states */

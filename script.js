@@ -3,7 +3,7 @@ const game = (() => {
   const player1 = Player("Human");
   const player2 = Player("PC"); //Set to PC by default until changed manually
   let currentPlayer = player1;
-  let opponent = player2;
+  // let opponent = player2;
 
   // Tracker for PC Intelligence
   let lastHit = null;
@@ -15,55 +15,91 @@ const game = (() => {
 
   // Game Controller Functions
   function renderGameboard() {
-    // Initiate gameboards & gameboard elements
-    const playerGameboard = currentPlayer.gameboard;
-    const oppGameboard = opponent.gameboard;
+    console.log("current player:", currentPlayer);
 
+    // Get gameboard elements
     const player1BoardElement = document.getElementById("player1board");
     const player2BoardElement = document.getElementById("player2board");
-    const player1BoardDivElement = document.getElementById("player1boardDiv");
-    const player2BoardDivElement = document.getElementById("player2boardDiv");
 
-    // Show both board divs
-    player1BoardDivElement.style.display = "block";
-    player2BoardDivElement.style.display = "block";
+    // Render and activate board based on current player and player 2 type
+    if (currentPlayer === player1 && player2.type === "human") {
+      console.log("Human vs Human (player 1's turn)");
 
-    // Determine which boards should be active/inactive based on the current player
-    if (currentPlayer === player1 && player2.type !== "pc") {
-      // Human vs Human (player 1's turn)
-      activatePlayerBoard(player2BoardElement);
+      // Activate opponent's board for interactions
       deactivatePlayerBoard(player1BoardElement);
-    } else if (currentPlayer === player2 && player2.type !== "pc") {
-      // Human vs Human (player 2's turn)
-      activatePlayerBoard(player1BoardElement);
-      deactivatePlayerBoard(player2BoardElement);
-    } else if (currentPlayer === player1 && player2.type === "pc") {
-      // Human vs PC (player 1's turn)
       activatePlayerBoard(player2BoardElement);
-      // deactivatePlayerBoard(player1BoardElement);
-    } else if (currentPlayer === player2 && player2.type === "pc") {
-      // Human vs PC (PC's turn)
+
+      // Clear both board elements & re-render
+      player1BoardElement.innerHTML = "";
+      player2BoardElement.innerHTML = "";
+
+      // Player 1 sees their own board (showing ships)
+      renderPlayerBoard(player1BoardElement, player1.gameboard);
+      // Player 2's board shows only hit/miss info (ships hidden)
+      renderOpponentBoard(player2BoardElement, player2.gameboard);
+
+    } else if (currentPlayer === player2 && player2.type === "human") {
+      console.log("Human vs Human (player 2's turn)");
+
+      // Activate opponent's board for interactions
       deactivatePlayerBoard(player2BoardElement);
-      // activatePlayerBoard(player1BoardElement);
+      activatePlayerBoard(player1BoardElement);
+
+      // Clear both board elements & re-render
+      player1BoardElement.innerHTML = "";
+      player2BoardElement.innerHTML = "";
+
+      // Player 2 sees their own board (showing ships)
+      renderPlayerBoard(player2BoardElement, player2.gameboard);
+      // Player 1's board shows only hit/miss info (ships hidden)
+      renderOpponentBoard(player1BoardElement, player1.gameboard);
+
+    } else if (currentPlayer === player1 && player2.type === "pc") {
+      console.log("Human vs PC (player 1's turn)");
+
+      // Activate PC's board for interactions
+      deactivatePlayerBoard(player1BoardElement);
+      activatePlayerBoard(player2BoardElement);
+
+      // Clear both board elements & re-render
+      player1BoardElement.innerHTML = "";
+      player2BoardElement.innerHTML = "";
+
+      // Player 1 sees their own board (showing ships)
+      renderPlayerBoard(player1BoardElement, player1.gameboard);
+      // Player 2's board shows only hit/miss info (ships hidden)
+      renderOpponentBoard(player2BoardElement, player2.gameboard);
+    } else if (currentPlayer === player2 && player2.type === "pc") {
+      console.log("Human vs PC (PC's turn)");
+
+      // Deativate PC's board to limit interactions
+      deactivatePlayerBoard(player2BoardElement);
+      activatePlayerBoard(player1BoardElement);
+
+      // Check if it is the PC's turn and apply random click plays if so
+      pcClicks();
     }
-
-    // Clear both board elements to prepare for rendering
-    player1BoardElement.innerHTML = "";
-    player2BoardElement.innerHTML = "";
-
-    // Render the player's board
-    renderPlayerBoard(player1BoardElement, playerGameboard);
-
-    // Render the opponent's board with click listeners
-    renderOpponentBoard(player2BoardElement, oppGameboard);
-
-    // Check if it is the PC's turn and apply random click plays if so
-    pcClicks();
   }
   function activatePlayerBoard(boardElement) {
+    const player1BoardElement = document.getElementById("player1board");
+    const player2BoardElement = document.getElementById("player2board");
+
     boardElement.classList.remove("off");
+    if (boardElement === player1BoardElement && player2.type === "pc") {
+      console.log("1")
+      boardElement.classList.add("on3");
+    } else if (boardElement === player1BoardElement && player2.type !== "pc") {
+      console.log("2");
+      boardElement.classList.add("on2");
+    } else if (boardElement === player2BoardElement) {
+      console.log("3");
+      boardElement.classList.add("on1");
+    }
   }
   function deactivatePlayerBoard(boardElement) {
+    boardElement.classList.remove("on1");
+    boardElement.classList.remove("on2");
+    boardElement.classList.remove("on3");
     boardElement.classList.add("off");
   }
   function renderPlayerBoard(boardElement, gameboard) {
@@ -81,6 +117,9 @@ const game = (() => {
         }
         if (gameboard.isHitAt(i, j)) {
           cell.classList.add("playerIsHit");
+        }
+        if (gameboard.isMissAt(i, j)) {
+          cell.classList.add("attackMiss");
         }
         const playerShip = gameboard.getShipAt(i, j);
         if (playerShip && playerShip.isSunk()) {
@@ -178,7 +217,7 @@ const game = (() => {
             }
           }
         }
-      }, 1000); // Add a delay of 1.5 seconds before the PC makes its move.
+      }, 1000); // Add a delay of 1 second before the PC makes its move.
     }
 
     function addPotentialTargets(x, y) {
@@ -301,6 +340,12 @@ const game = (() => {
   }
 
   // User Interface (Menus)
+  const mainDiv = document.getElementById("main");
+  const switchPlayerDiv = document.getElementById("switchPlayerDiv");
+  const switchPlayersMsg = document.getElementById("switchPlayersH4");
+  const readyToSwitchBtn = document.getElementById("readyToSwitchBtn");
+  
+
   function fadeOverlay() {
     window.addEventListener("load", () => {
       document.body.classList.add("loaded");
@@ -384,21 +429,21 @@ const game = (() => {
         bothReady = true; // Will make true after the first click. 2nd click will process as true
       } else {
         closeMenuAndRenderGame();
-        const switchPlayersMsg = document.getElementById("switchPlayersH4");
-        setTimeout(() => {
-          switchPlayersMsg.style.visibility = "visible";
-        }, 500); // .5 sec delay
       }
     });
 
     function closeMenuAndRenderGame() {
       closeMenu();
       setTimeout(() => {
+        const mainDiv = document.getElementById("main");
+        mainDiv.style.display = "flex";
         const gameboards = document.querySelectorAll(".gameboard");
         for (const gameboard of gameboards) {
           gameboard.style.display = "grid";
         }
         renderGameboard();
+        switchPlayerDiv.style.visibility = "visible";
+        readyToSwitchBtn.style.display = "block";
       }, 500);
     }
 
@@ -516,34 +561,46 @@ const game = (() => {
     }, 500);
   }
   function switchPlayer() {
-    const mainDiv = document.getElementById("main");
-    const switchPlayersMsg = document.getElementById("switchPlayersH4");
-    const readyToSwitchBtn = document.getElementById("readyToSwitchBtn");
-
     // Check if Human or PC opponent for proper switch action
     if (player2.type === "human") {
-      console.log("human shit");
       // Update player's turn message, hide boars, & make Ready Btn visible
       if (currentPlayer === player1) {
-        switchPlayersMsg.innerHTML = "Player 2's Turn";
-      } else if (currentPlayer === player2) {
         switchPlayersMsg.innerHTML = "Player 1's Turn";
+        switchPlayersMsg.style.color = "#85bce4";
+        switchPlayersMsg.style.textShadow = "0px 0px 20px #058bff";
+        switchPlayerDiv.style.visibility = "visible";
+        readyToSwitchBtn.style.visibility = 'visible';
+      } else if (currentPlayer === player2) {
+        switchPlayersMsg.innerHTML = "Player 2's Turn";
+        switchPlayersMsg.style.color = "#e58585";
+        switchPlayersMsg.style.textShadow = "0px 0px 20px #ff0505";
+        switchPlayerDiv.style.visibility = "visible";
+        readyToSwitchBtn.style.visibility = "visible";
       }
       mainDiv.style.visibility = "hidden";
-      readyToSwitchBtn.style.visibility = "visible";
     } else if (player2.type === "pc") {
       if (currentPlayer === player1) {
-        switchPlayersMsg.innerHTML = "Player 1's Turn";
-      } else if (currentPlayer === player2){
-        switchPlayersMsg.innerHTML = "PC making move...";
+        switchPlayersMsg.innerHTML = "Player 1 Attacking";
+        switchPlayersMsg.style.color = "#85bce4";
+        switchPlayersMsg.style.textShadow = "0px 0px 20px #058bff";
+      } else if (currentPlayer === player2) {
+        switchPlayersMsg.innerHTML = "PC Attacking...";
+        switchPlayersMsg.style.color = "#d2cdb2";
+        switchPlayersMsg.style.textShadow = "0px 0px 20px #ffd36d";
       }
-
+      switchPlayerDiv.style.visibility = "visible";
     }
 
     readyToSwitchBtn.addEventListener("click", () => {
       // When Ready Button in clicked, hide Btn, & show Main (Boards)
-      readyToSwitchBtn.style.visibility = "none";
+      readyToSwitchBtn.style.visibility = "hidden";
       mainDiv.style.visibility = "visible";
+      // Update message to attacker
+      if (currentPlayer === player1) {
+        switchPlayersMsg.innerHTML = "Player 1 Attacking";
+      } else if (currentPlayer === player2) {
+        switchPlayersMsg.innerHTML = "Player 2 Attacking";
+      }
     });
   }
 
