@@ -362,8 +362,9 @@ const game = (() => {
     const orientationBtn = document.getElementById("orientationBtn");
     const randomBtn = document.getElementById("randomBtn");
     const readyBtn = document.getElementById("readyBtn");
+    const clearBtn = document.getElementById("clearBtn");
     let currentlyPlacingShips = player1;
-    let bothReady = false;
+    let player2Ready = false;
 
     // Define ship sizes
     const shipSizes = [5, 4, 3, 3, 2];
@@ -403,8 +404,47 @@ const game = (() => {
 
     });
     readyBtn.addEventListener("click", function () {
-      // shipsMenu for player 2 if 'human'
+
+      // Check that all ships have been placed
+      if (currentShipIndex < shipSizes.length) {
+        alert(`${shipSizes.length - currentShipIndex} ships left to place`);
+        return;
+      } 
+
+      // Check if P2 is human and needs to place ships
       if (player2.type === "human") {
+        setupPlayer2ShipMenu();
+      } else if (player2.type === "pc") {
+        randomPlayerShips(player2, length);
+        player2Ready = true;
+      }
+
+      // Check if P2 is ready & render game if so
+       if (player2Ready) {
+         // Close Menu
+         const menu = document.querySelector(".menu");
+         menu.classList.add("fade-out");
+         setTimeout(() => {
+           menu.style.display = "none";
+         }, 500);
+         // Render Game
+         setTimeout(() => {
+           const mainDiv = document.getElementById("main");
+           mainDiv.style.display = "flex";
+           const gameboards = document.querySelectorAll(".gameboard");
+           for (const gameboard of gameboards) {
+             gameboard.style.display = "grid";
+           }
+           renderGameboard();
+           switchPlayerDiv.style.visibility = "visible";
+           readyToSwitchBtn.style.display = "block";
+         }, 500);
+       } else if (!player2Ready) {
+         player2Ready = true; 
+       }
+      
+      // Function Declarations
+      function setupPlayer2ShipMenu() {
         const h3 = document.getElementById("placeShipsH3");
         h3.innerHTML = "Player 2: Place Your Ships";
         currentShipIndex = 0; // Reset Index for ship length
@@ -412,35 +452,12 @@ const game = (() => {
         orientationBtn.innerHTML = "Horizontal"; // Reset Orientation Btn Txt
         createShipsBoard(player2);
         currentlyPlacingShips = player2;
-      } else if (player2.type === "pc") {
-        randomPlayerShips(player2, length);
-        bothReady = true;
       }
-
-      if (!bothReady) {
-        bothReady = true; // Will make true after the first click. 2nd click will process as true
-      } else {
-        // Close Menu
-        const menu = document.querySelector(".menu");
-        menu.classList.add("fade-out");
-        setTimeout(() => {
-          menu.style.display = "none";
-        }, 500);
-
-        // Render Game
-        setTimeout(() => {
-          const mainDiv = document.getElementById("main");
-          mainDiv.style.display = "flex";
-          const gameboards = document.querySelectorAll(".gameboard");
-          for (const gameboard of gameboards) {
-            gameboard.style.display = "grid";
-          }
-          renderGameboard();
-          switchPlayerDiv.style.visibility = "visible";
-          readyToSwitchBtn.style.display = "block";
-        }, 500);
-      }        
     });
+    clearBtn.addEventListener("click", function () {
+      clearShips(currentlyPlacingShips);
+    });
+
 
     // Functions for ship creation
     function randomPlayerShips(player, length) {
@@ -463,6 +480,7 @@ const game = (() => {
             player.gameboard.placeShip(ship, x, y, orientation);
             placed = true;
             showPlacedShips(x, y, length); 
+            currentShipIndex++;
           }
         }
       });
@@ -503,7 +521,7 @@ const game = (() => {
           // Add event listeners for hover and click events
           cell.addEventListener("mouseenter", highlightCells);
           cell.addEventListener("mouseleave", removeHighlight);
-          cell.addEventListener("click", placeShip);
+          cell.addEventListener("click", handleShipPlacement);
 
           playerShipBoard.appendChild(cell);
         }
@@ -543,7 +561,9 @@ const game = (() => {
           cell.classList.remove("invalid");
         });
       }
-      function placeShip(event) {
+      function handleShipPlacement(event) {
+        // Function handles ship placement on the user interface. Calls for ship placement within board
+        // Set the x & y to the clicked cells data set
         const x = parseInt(event.target.dataset.x);
         const y = parseInt(event.target.dataset.y);
         const orientation = currentOrientation;
@@ -575,7 +595,7 @@ const game = (() => {
           showPlacedShips();
           currentShipIndex++; // Move to the next ship
           if (currentShipIndex > shipSizes.length) {
-            alert("All ships placed! Click 'Ready' to start the game.");
+            alert("All ships placed. Click the Ready button to start game.");
           }
         }
       }
@@ -597,8 +617,9 @@ const game = (() => {
       }
     }
     function clearShips(player) {
-      // Clear from internal gameboard representation
-      player.gameboard.removeShips();
+      player.gameboard.removeShips(); // Clear from internal gameboard representation
+
+      currentShipIndex = 0; // Reset Index
 
       // Clear ship representation from the DOM.
       let playerShipBoard;
@@ -826,7 +847,3 @@ function Player(typeParam) {
 
 //Notes:
 // x = row, y = column
-
-
-
-
