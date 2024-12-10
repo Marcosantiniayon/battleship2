@@ -83,13 +83,49 @@ body.loaded::before {
 .heading.visible {
     opacity: 1;
 }
+#gameDiv{
+    display: flex;
+    flex-direction: column;
+}
 #main {
     gap: 40px;
     align-self: center;
-    padding: 24px;
+    /* padding: 24px; */
     flex: 1;
     display: none;
     flex-direction: row;
+}
+#gameOptionsDiv{
+    margin-top: 40px;
+    display: flex;
+    width: 100%;
+    align-content: center;
+    justify-content: center;
+}
+#gameOverDiv{
+    display: none;
+    flex-direction: column;
+    gap: 30px;
+    align-self: center;
+    justify-content: center;
+    width: 400px;
+    height: 200px;
+    border-radius: 20px;
+    margin-top: 80px;
+    /* background-color: #5f9aa0e8; */
+    border: solid 4px white;
+}
+.gameOver1{
+    background-color: #2e5c84;
+}
+.gameOver2 {
+    background-color: #832c2c;
+}
+.gameOver3 {
+    background-color: #8e7d2e;
+}
+#winningPlayerMssg{
+    color: white;
 }
 
 /* Menus */
@@ -134,7 +170,7 @@ body.loaded::before {
     height: 0px;
     visibility: hidden;
     flex-direction: column;
-    gap: 20px;
+    /* gap: 20px; */
     align-items: center;
     justify-items: center;
     opacity: 0;
@@ -142,6 +178,30 @@ body.loaded::before {
 #shipsMenu.fade-in{
     opacity: 1;
     transition: opacity .5s ease-in;
+}
+#shipsMenuTop{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+}
+#playerTitle{
+    font-size: x-large;
+    background-color: #2473b79e;
+    color: white;
+    margin: 0px;
+    width: 100%;
+    height: 40px;
+    align-content: center;
+}
+#placeShipsMsg{
+    background-color: #2473b79e;
+    font-size: large;
+    color: white;
+    width: 120px;
+    margin: 10px;
+    border-radius: 8px;
 }
 #switchPlayerDiv{
     /* height: 16px;  */
@@ -154,6 +214,7 @@ body.loaded::before {
 #readyToSwitchBtn{
     display: none;
     visibility: hidden;
+    margin-top: 20px;
 }
 #switchPlayersH4{
     color: #85bce4;
@@ -172,19 +233,22 @@ h1 {
         -2px 2px 0 rgba(48, 67, 111, 0.682),
         2px 2px 0 rgba(48, 67, 111, 0.682);
     margin-bottom: 32px;
+    /* margin-top: 32px; */
 }
 h3{
     font-size: 1.5REM;
     margin: 0px;
-    color: rgba(48, 67, 111, 0.682);
-    text-shadow:
+    color: white;
+    /* color: rgba(48, 67, 111, 0.682); */
+    /* text-shadow:
         -1px -1px 0 #ffffff,
         1px -1px 0 #ffffff,
         -1px 1px 0 #ffffff,
-        1px 1px 0 #ffffff;
+        1px 1px 0 #ffffff; */
 }
 h4{
     font-size: 1.5REM;
+    margin: 12px;
 }
 
 /* Buttons */
@@ -210,14 +274,20 @@ button:not(:disabled):hover{
     transform: scale(1.2);
     border: 2px solid rgba(48, 67, 111, 0.682);
 }
+#readyBtn{
+    margin-top: 12px;
+}
 #newGameBtn{
     display: none;
+}
+#newGameBtn:hover{
+    width: 90px;
 }
 
 /* Gameboard elements */
 .boardDiv{
     /* display: none; */
-    width: 45%;
+    /* width: 45%; */
     margin: 0 auto;
     text-align: center;
 }
@@ -225,7 +295,7 @@ button:not(:disabled):hover{
     /* display: none; */
 }
 .gameboard {
-    margin-top: 20px;
+    margin: 20px;
     /* display: none; */
     grid-template-columns: repeat(10, 30px);
     grid-template-rows: repeat(10, 30px);
@@ -270,7 +340,7 @@ button:not(:disabled):hover{
     background-color: rgb(73, 221, 90)
 }
 .attackMiss{
-    background-color: rgb(34, 34, 34)
+    background-color: rgba(44, 44, 44, 0.85)
 }
 .playerIsHit{
     background-color: rgba(171, 83, 42, 1);
@@ -295,5 +365,13 @@ button:not(:disabled):hover{
     .menu {
         width: 300px;
         padding: 20px 0px 40px 0px;
+    }
+    #gameOverDiv {
+        display: none;
+        width: 300px;
+        height: 200px;
+        border-radius: 20px;
+        margin-top: 20px;
+        background-color: #5f9aa0e8;
     }
 }

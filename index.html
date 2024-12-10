@@ -13,11 +13,6 @@
     <div class="content">
         <div class="heading">
             <h1>Naval Strike</h1>
-            <button id="newGameBtn">New Game</button>
-        </div>
-        <div id="switchPlayerDiv">
-            <h4 id="switchPlayersH4">Player 1 Attacking</h4>
-            <button id="readyToSwitchBtn">Ready</button>
         </div>
         <div class="menu">
             <div id="playerMenu">
@@ -28,7 +23,10 @@
                 </div>
             </div>
             <div id="shipsMenu">
-                <h3 id="placeShipsH3">Player 1: Place Your Ships</h3>
+                <div id="shipsMenuTop">
+                    <p id="playerTitle">Player 1</p>
+                    <p id="placeShipsMsg">Place Ships</p>
+                </div>
                 <div class="gameboard" id="player1ShipBoard">
                     <!-- Dinamnically create board -->
                 </div>
@@ -43,15 +41,28 @@
                 <button id="readyBtn">Ready</button>
             </div>
         </div>
-        <div id="main">
-            <div id="player1boardDiv" class="boardDiv">
-                <h4 class="boardDivH4">Player 1</h4>
-                <div id="player1board" class="gameboard"></div>
+        <div id="gameDiv">
+            <div id="switchPlayerDiv">
+                <h4 id="switchPlayersH4">Player 1 Attacking</h4>
+                <button id="readyToSwitchBtn">Ready</button>
             </div>
-            <div id="player2boardDiv" class="boardDiv">
-                <h4 class="boardDivH4">Player 2</h4>
-                <div id="player2board" class="gameboard"></div>
+            <div id="main">
+                <div id="player1boardDiv" class="boardDiv">
+                    <h4 class="boardDivH4">Player 1</h4>
+                    <div id="player1board" class="gameboard"></div>
+                </div>
+                <div id="player2boardDiv" class="boardDiv">
+                    <h4 class="boardDivH4">Player 2</h4>
+                    <div id="player2board" class="gameboard"></div>
+                </div>
             </div>
+        </div>
+        <div id="gameOverDiv">
+            <h3 id="gameOverMssg">GAME OVER</h3>
+            <h4 id="winningPlayerMssg">Player X Wins!</h4>
+        </div>
+        <div id="gameOptionsDiv">
+            <button id="newGameBtn">New Game</button>
         </div>
     </div>
 
